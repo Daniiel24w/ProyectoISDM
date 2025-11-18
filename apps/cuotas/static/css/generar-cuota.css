@@ -1,0 +1,34 @@
+.card-header {
+    background-color: #63181d; /* Color vino para el header */
+    color: white; /* Texto blanco para contraste */
+}
+
+/* Borde para todas las tarjetas de la página */
+.card {
+    border: 1px solid #63181d;
+}
+
+/* Estilo para los botones de acción principales */
+.btn-generate {
+    background-color: #28a745; /* Verde */
+    color: white;
+    font-weight: 500;
+    border-radius: 50px;
+    border: none;
+}
+.btn-generate:hover {
+    background-color: #218838;
+    color: white;
+}
+
+.btn-schedule {
+    background-color: #ffc107; /* Amarillo */
+    color: #212529;
+    font-weight: 500;
+    border-radius: 50px;
+    border: none;
+}
+.btn-schedule:hover {
+    background-color: #e0a800;
+    color: #212529;
+}

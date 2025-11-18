@@ -1,0 +1,128 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Generar Cuotas - Proyecto ISDM{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'css/generar-cuota.css' %}">
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Tarjeta 1: Filtro de Generación -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Filtro de Generación</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-4">{{ form.carrera.label_tag }}{{ form.carrera }}</div>
+                <div class="col-md-4">{{ form.cohorte.label_tag }}{{ form.cohorte }}</div>
+                <div class="col-md-4">{{ form.plan_pago.label_tag }}{{ form.plan_pago }}</div>
+                <div class="col-md-4">{{ form.mes.label_tag }}{{ form.mes }}</div>
+                <div class="col-md-4">{{ form.año.label_tag }}{{ form.año }}</div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ form.forzar_regeneracion }}
+                        {{ form.forzar_regeneracion.label_tag }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <!-- Tarjeta 2: Vencimiento -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><h5 class="mb-0">Vencimiento</h5></div>
+                <div class="card-body p-4">
+                    <div class="mb-3">{{ form.dia_vencimiento.label_tag }}{{ form.dia_vencimiento }}</div>
+                    <div>{{ form.manejo_dias_no_habiles.label_tag }}{{ form.manejo_dias_no_habiles }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <!-- Tarjeta 3: Mora -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><h5 class="mb-0">Mora</h5></div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-12">{{ form.tipo_recargo.label_tag }}{{ form.tipo_recargo }}</div>
+                        <div class="col-md-12">
+                            {{ form.valor_mora.label_tag }}
+                            <div class="input-group">
+                                <span class="input-group-text" id="valor-addon">$</span>
+                                {{ form.valor_mora }}
+                            </div>
+                        </div>
+                        <div class="col-md-12">{{ form.frecuencia_mora.label_tag }}{{ form.frecuencia_mora }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjeta 4: Acciones -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h5 class="mb-0">Acciones</h5></div>
+        <div class="card-body p-4 text-center">
+            <button type="submit" class="btn btn-generate px-5 py-2 mx-2">Generar cuota</button>
+            <button type="button" class="btn btn-schedule px-5 py-2 mx-2" data-bs-toggle="modal" data-bs-target="#programarCuotaModal">Programar cuota</button>
+        </div>
+    </div>
+</form>
+
+<!-- Modal para Confirmar Generación -->
+<div class="modal fade" id="confirmarGeneracionModal" tabindex="-1" aria-labelledby="confirmarGeneracionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarGeneracionLabel">Confirmar Generación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de que desea generar las cuotas con los filtros seleccionados? Este proceso se ejecutará en segundo plano.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-generate">Confirmar y Generar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Programar Cuota -->
+<div class="modal fade" id="programarCuotaModal" tabindex="-1" aria-labelledby="programarCuotaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="programarCuotaLabel">Programar Generación de Cuota</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="programar-fecha" class="form-label">Fecha de ejecución</label>
+                        <input type="date" class="form-control" id="programar-fecha">
+                    </div>
+                    <div class="mb-3">
+                        <label for="programar-hora" class="form-label">Hora de ejecución</label>
+                        <input type="time" class="form-control" id="programar-hora">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-schedule">Confirmar Programación</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script src="{% static 'js/generar-cuotas.js' %}"></script>
+{% endblock %}

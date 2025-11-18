@@ -1,0 +1,236 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #f4f6f9;
+    overflow-x: hidden; /* Previene el scroll horizontal */
+}
+
+#main-wrapper {
+    display: flex;
+}
+
+/* --- 1. Sidebar (Izquierda - Oscura) --- */
+#sidebar {
+    width: 280px;
+    height: 100vh;
+    position: fixed; /* Fijo en la pantalla */
+    top: 0;
+    left: 0;
+    background-color: #343a40;
+    color: #c2c7d0;
+    transition: width 0.3s ease-in-out; /* Animación para colapsar */
+    z-index: 1000;
+}
+
+.sidebar-header .sidebar-logo {
+    height: 50px; /* Ajusta la altura del logo */
+    width: auto;
+    transition: height 0.3s ease-in-out;
+}
+
+#sidebar .isdem-brand-text {
+    color: #fff;
+    transition: opacity 0.2s ease-in-out;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.isdem-brand-full {
+    display: block;
+}
+
+.isdem-brand-short {
+    display: none; /* Oculto por defecto */
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+#sidebar .nav-link {
+    color: #c2c7d0;
+    font-size: 1rem;
+    padding: 0.7rem 1.5rem; /* Ajuste ligero de padding */
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease, color 0.2s ease; /* Animación para hover */
+}
+
+#sidebar .nav-link .nav-text {
+    transition: opacity 0.2s ease-in-out;
+}
+
+
+#sidebar .nav-link i {
+    font-size: 1.3rem;
+    margin-right: 0.8rem;
+}
+
+#sidebar .nav-link:hover,
+#sidebar .nav-link.active {
+    background-color: #495057;
+    color: #fff;
+}
+
+/* --- Sidebar Footer --- */
+.sidebar-footer {
+    padding-bottom: 1rem;
+}
+
+/* Estilo para el botón de logout, ahora como un nav-link */
+.nav-link-logout {
+    background-color: #dc3545; /* Fondo rojo por defecto */
+    color: #fff !important; /* Texto blanco para contraste, !important para sobreescribir */
+    font-weight: 500;
+    border-radius: 5px; /* Bordes redondeados */
+    border: none; /* Quitamos el borde por defecto de los botones */
+}
+
+.nav-link-logout:hover,
+.nav-link-logout.active {
+    /* Se oscurece al pasar el mouse */
+    background-color: #c82333 !important;
+    color: #fff !important;
+}
+
+.sidebar-copyright {
+    font-size: 0.75rem;
+    color: #6c757d; /* Gris claro */
+    margin-top: 0.5rem;
+}
+
+/* --- Estilos para cuando el sidebar está colapsado --- */
+body.sidebar-collapsed #sidebar {
+    width: 88px; /* Ancho del sidebar colapsado */
+}
+
+body.sidebar-collapsed #sidebar .isdem-brand-full,
+body.sidebar-collapsed #sidebar .nav-text {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas durante la transición */
+}
+
+body.sidebar-collapsed #sidebar .isdem-brand-short {
+    display: block; /* Se muestra al colapsar */
+}
+
+body.sidebar-collapsed #sidebar .isdem-brand-full {
+    display: none; /* Se oculta completamente para no interferir */
+}
+
+body.sidebar-collapsed .sidebar-header .sidebar-logo {
+    height: 40px;
+}
+
+body.sidebar-collapsed #sidebar .nav-link,
+body.sidebar-collapsed #sidebar .sidebar-footer {
+    justify-content: center; /* Centra el contenido (el ícono) */
+}
+
+body.sidebar-collapsed #sidebar .nav-link {
+    padding-left: 0; /* Eliminamos el padding horizontal para centrar bien el ícono */
+    padding-right: 0;
+}
+
+body.sidebar-collapsed #sidebar .nav-link-logout {
+    text-align: center; /* Centramos el contenido del botón cuando está colapsado */
+}
+
+body.sidebar-collapsed #sidebar .nav-link i,
+body.sidebar-collapsed #sidebar .nav-link-logout i {
+    margin-right: 0; /* Quita el margen del ícono cuando está colapsado */
+    font-size: 1.5rem; /* Tamaño de ícono consistente y proporcionado */
+    line-height: 1; /* Asegura una mejor alineación vertical */
+}
+
+/* --- 2. Content Wrapper (Derecha) --- */
+#content-wrapper {
+    margin-left: 280px; /* Deja espacio para el sidebar */
+    width: calc(100% - 280px);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out; /* Animación */
+}
+
+body.sidebar-collapsed #content-wrapper {
+    margin-left: 88px; /* Mismo ancho que el sidebar colapsado */
+    width: calc(100% - 88px);
+}
+
+/* --- 2a. Header (Superior - Clara) --- */
+#header {
+    background-color: #495057; /* Un poco más claro que el sidebar */
+    color: #c2c7d0; /* Texto claro */
+    padding: 0.75rem 1.5rem;
+}
+
+#header #sidebar-toggle { /* Icono Hamburger */
+    font-size: 2rem;
+    cursor: pointer;
+    color: #f8f9fa; /* Color más claro para que resalte */
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+#header #sidebar-toggle:hover {
+    background-color: #343a40; /* Se oscurece al pasar el mouse */
+}
+
+.user-profile {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.user-profile:hover {
+    background-color: #343a40; /* Se oscurece al pasar el mouse */
+}
+
+#header .user-profile .user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #6c757d; /* Círculo gris */
+    border-radius: 50%;
+}
+#header .user-profile .user-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f8f9fa; /* Color blanco/claro */
+}
+
+/* --- Estilos para el Dropdown de Usuario --- */
+.dropdown-menu {
+    min-width: 240px; /* Menú desplegable más ancho */
+    background-color: #343a40; /* Fondo oscuro */
+    border: 1px solid #495057;
+}
+
+.dropdown-menu .dropdown-item {
+    color: #c2c7d0; /* Texto claro */
+    padding: 0.75rem 1.5rem;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #495057;
+    color: #fff;
+}
+
+.dropdown-item-logout,
+.dropdown-item-logout i {
+    color: #dc3545 !important; /* Color rojo para logout */
+    font-weight: 500;
+}
+.dropdown-item-logout:hover {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* --- 2b. Main Content --- */
+#main-content {
+    flex-grow: 1; /* Ocupa el espacio restante */
+    /* Se elimina el footer de aquí, ahora está en el sidebar */
+}
+
+/* --- 2c. Footer (Eliminado) --- */
+/* El footer ahora está integrado en el sidebar */

@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - Proyecto ISDM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard Principal</h1>
+</div>
+
+<div class="row">
+    <!-- Card de Bienvenida -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-emoji-smile-fill me-2"></i> ¡Bienvenido!
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Hola, Daniel</h5>
+                <p class="card-text">Nos alegra verte de nuevo. Desde este panel podrás administrar todas las operaciones del sistema de forma rápida y sencilla.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card de Resumen de Cuotas -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center"><i class="bi bi-calendar-check me-2"></i> Cuotas del Año</div>
+            <div class="card-body">
+                <h5 class="card-title">Resumen de Cuotas 2024</h5>
+                <p class="card-text">Aquí se mostrará un resumen de las cuotas generadas durante el año actual, como el total recaudado y el número de cuotas pagadas vs. pendientes.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card de Gráfica -->
+    <div class="col-lg-4 col-md-12 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center"><i class="bi bi-bar-chart-line-fill me-2"></i> Analíticas</div>
+            <div class="card-body">
+                <h5 class="card-title">Gráfica de Rendimiento</h5>
+                <p class="card-text">En este espacio se visualizará una gráfica interactiva con datos relevantes sobre el rendimiento de los pagos o el crecimiento de usuarios.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

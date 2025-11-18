@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Registrar Nuevo Usuario{% endblock %}
+
+{% block custom_css %}
+<style>
+    .input-group-icon {
+        border-right: 0;
+    }
+    .password-rules-list { list-style: none; padding-left: 0; }
+    .password-rule { color: #6c757d; transition: color 0.3s ease; }
+    .password-rule.valid { color: #198754; text-decoration: line-through; }
+    .password-rule.valid::before { content: '✓ '; color: #198754; }
+    .password-rule.invalid { color: #dc3545; }
+    .password-rule.invalid::before { content: '✗ '; color: #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Registrar Nuevo Usuario</h1>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Datos del Usuario</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
+                            <div class="col-md-6 mb-3">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
+                        </div>
+
+                        <div class="mb-3">{{ form.username.label_tag }} {{ form.username }}</div>
+                        {% for error in form.username.errors %}<div class="invalid-feedback d-block mb-2">{{ error }}</div>{% endfor %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">{{ form.email.label_tag }} {{ form.email }}</div>
+                            <div class="col-md-6 mb-3">{{ form.telefono.label_tag }} {{ form.telefono }}</div>
+                        </div>
+                        {% for error in form.email.errors %}<div class="invalid-feedback d-block mb-2">{{ error }}</div>{% endfor %}
+                        {% for error in form.telefono.errors %}<div class="invalid-feedback d-block mb-2">{{ error }}</div>{% endfor %}
+
+                        <hr class="my-4">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.password1.label_tag }}
+                                {{ form.password1 }}
+                                <div class="form-text">
+                                    <ul id="password-help-container" class="password-rules-list mt-2">
+                                        <!-- Las reglas de JS se insertarán aquí -->
+                                    </ul>
+                                </div>
+                                {% for error in form.password1.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.password2.label_tag }}
+                                {{ form.password2 }}
+                                {% for error in form.password2.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="mb-3">
+                            {{ form.rol.label_tag }}
+                            {{ form.rol }}
+                            {% if form.rol.help_text %}
+                                <div class="form-text">{{ form.rol.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.rol.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="mt-4 text-end">
+                            <a href="{% url 'core:index' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script src="{% static 'js/registro.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,34 @@
+body, html {
+    height: 100%;
+    margin: 0;
+}
+
+.login-container {
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 1rem;
+}
+
+.login-logo {
+    height: 70px;
+    width: auto;
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    background-color: #343a40;
+    border-color: #343a40;
+}
+.btn-primary:hover {
+    background-color: #23272b;
+    border-color: #1d2124;
+}

@@ -1,0 +1,93 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Supervisión de Lotes{% endblock %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static 'reportes/css/reportes.css' %}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="card shadow">
+        <div class="card-header">
+            <h2 class="card-title mb-0">Supervisión de Lotes Generados</h2>
+        </div>
+        <div class="card-body">
+            <p class="card-text">Historial de ejecuciones de generación de cuotas.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="lotesTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID Lote</th>
+                            <th>Fecha</th>
+                            <th>Usuario</th>
+                            <th>Filtros Aplicados</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- El contenido de la tabla será cargado por DataTables vía AJAX -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ver Resumen -->
+<div class="modal fade" id="resumenModal" tabindex="-1" role="dialog" aria-labelledby="resumenModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resumenModalLabel">Resumen del Lote LOTE-001</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Cuotas Creadas:</strong> 350</p>
+        <p><strong>Monto Total:</strong> $17,500,000.00</p>
+        <p><strong>Inconsistencias:</strong> 0</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Anular Lote -->
+<div class="modal fade" id="anularModal" tabindex="-1" role="dialog" aria-labelledby="anularModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="anularModalLabel">Anular Lote LOTE-001</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Está seguro de que desea anular este lote? Esta acción no se puede deshacer.</p>
+        <div class="form-group">
+            <label for="motivoAnulacion">Motivo de Anulación (obligatorio):</label>
+            <textarea class="form-control" id="motivoAnulacion" rows="3" required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmarAnulacion">Confirmar Anulación</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="{% static 'reportes/js/reportes.js' %}"></script>
+{% endblock %}

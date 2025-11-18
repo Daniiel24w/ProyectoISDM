@@ -1,0 +1,120 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Ajustes Manuales de Cuotas{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Ajuste Puntual de Cuotas de Alumnos</h1>
+    </div>
+
+    <!-- Componente 1: Buscador de Alumno -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Buscador de Alumno</h5>
+        </div>
+        <div class="card-body">
+            <form class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="search-alumno" class="form-label">Ingrese Legajo o DNI del Alumno</label>
+                    <input type="text" class="form-control" id="search-alumno" placeholder="Ej: 1234 o 12.345.678">
+                </div>
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Componente 2: Resultados de Búsqueda (Aparece post-búsqueda) -->
+    <div class="card shadow-sm mb-4" id="resultados-busqueda" style="display: block;"> <!-- Cambiar a 'none' para ocultar por defecto -->
+        <div class="card-header">
+            <h5 class="mb-0">Resultados</h5>
+        </div>
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">Datos del Alumno</h6>
+            <p><strong>Nombre:</strong> Juan Perez<br>
+               <strong>Legajo:</strong> 1234<br>
+               <strong>DNI:</strong> 12.345.678</p>
+            
+            <hr>
+
+            <h6 class="card-subtitle mt-4 mb-3 text-muted">Cuotas del Alumno</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Período</th>
+                            <th>Monto</th>
+                            <th>Vencimiento Original</th>
+                            <th>Vencimiento Ajustado</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ejemplo de cuota pendiente -->
+                        <tr>
+                            <td>Dic-2025</td>
+                            <td>$50.000</td>
+                            <td>10/12/2025</td>
+                            <td>-</td>
+                            <td><span class="badge bg-warning text-dark">Pendiente</span></td>
+                            <td>
+                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#ajustarVencimientoModal">Ajustar Vencimiento</button>
+                            </td>
+                        </tr>
+                        <!-- Ejemplo de cuota pagada -->
+                        <tr>
+                            <td>Nov-2025</td>
+                            <td>$50.000</td>
+                            <td>10/11/2025</td>
+                            <td>-</td>
+                            <td><span class="badge bg-success">Pagada</span></td>
+                            <td>
+                                <button class="btn btn-info btn-sm" disabled>Ajustar Vencimiento</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Componente 3: Modal "Ajustar Vencimiento" -->
+<div class="modal fade" id="ajustarVencimientoModal" tabindex="-1" aria-labelledby="ajustarVencimientoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ajustarVencimientoLabel">Ajustar Vencimiento (Cuota: Dic-2025)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="nueva-fecha-vencimiento" class="form-label">Nueva Fecha de Vencimiento</label>
+                        <input type="date" class="form-control" id="nueva-fecha-vencimiento">
+                    </div>
+                    <div class="mb-3">
+                        <label for="motivo-ajuste" class="form-label">Motivo del Ajuste (obligatorio)</label>
+                        <textarea class="form-control" id="motivo-ajuste" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary">Guardar Ajuste</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    // Aquí puedes agregar JS para mostrar/ocultar la sección de resultados
+    // y para pasar datos dinámicos al modal.
+</script>
+{% endblock %}
