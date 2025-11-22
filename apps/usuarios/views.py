@@ -3,8 +3,8 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-
-from .forms import CustomUserCreationForm
+from django.db import transaction
+from .forms import CustomUserCreationForm, UserUpdateForm, PerfilUpdateForm
 
 class CustomLoginView(LoginView):
     """
@@ -17,8 +17,36 @@ class CustomLoginView(LoginView):
 
 @login_required
 def perfil_view(request):
-    # Aquí puedes pasar el objeto 'user' al contexto si necesitas más datos
-    return render(request, 'usuarios/perfil.html')
+    """
+    Muestra la página de perfil del usuario logueado.
+    """
+    # Pasamos el objeto 'user' (que ya está disponible a través de request)
+    # y su perfil asociado al contexto de la plantilla.
+    return render(request, 'usuarios/perfil.html', {'perfil': request.user.perfil})
+
+@login_required
+@transaction.atomic
+def edit_perfil_view(request):
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        perfil_form = PerfilUpdateForm(request.POST, request.FILES, instance=request.user.perfil)
+        if user_form.is_valid() and perfil_form.is_valid():
+            user_form.save()
+            perfil_form.save()
+            messages.success(request, '¡Tu perfil ha sido actualizado exitosamente!')
+            return redirect('usuarios:perfil')
+        else:
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        perfil_form = PerfilUpdateForm(instance=request.user.perfil)
+
+    context = {
+        'user_form': user_form,
+        'perfil_form': perfil_form,
+        'perfil': request.user.perfil  # Para la imagen de perfil
+    }
+    return render(request, 'usuarios/edit-perfil.html', context)
 
 def es_desarrollador(user):
     """
@@ -33,12 +61,14 @@ def registro_view(request):
     Vista para que un desarrollador pueda registrar nuevos usuarios.
     """
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
             messages.success(request, f'¡La cuenta para "{username}" ha sido creada exitosamente!')
             return redirect('core:index') # Redirige al panel principal tras el éxito
+        else:
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
     else:
         form = CustomUserCreationForm()
     

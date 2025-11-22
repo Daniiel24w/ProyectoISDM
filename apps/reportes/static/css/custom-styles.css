@@ -1,0 +1,56 @@
+/* Definimos nuestro color principal para toda la aplicación */
+:root {
+    --color-principal: #63181d; /* Tono vino tinto solicitado */
+    --color-principal-hover: #501317; /* Un poco más oscuro para el hover */
+}
+
+/* Sobrescribimos los colores primarios de Bootstrap */
+.btn-primary {
+    background-color: var(--color-principal);
+    border-color: var(--color-principal);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-principal-hover);
+    border-color: var(--color-principal-hover);
+    color: white;
+}
+
+/* Estilo para las cabeceras de las tarjetas y modales */
+.card-header, .modal-header {
+    background-color: var(--color-principal);
+    color: white;
+}
+
+.card-header .card-title, .card-header h1, .card-header h2, .card-header h3, .card-header h4, .card-header h5, .card-header h6,
+.modal-header .modal-title {
+    color: white;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Estilo para los títulos principales de las páginas */
+.border-bottom h1, .border-bottom h2 {
+    color: var(--color-principal);
+}
+
+/* Estilo para los bordes de los campos de formulario al enfocarlos */
+.form-control:focus {
+    border-color: var(--color-principal);
+    box-shadow: 0 0 0 0.25rem rgba(99, 24, 29, 0.25);
+}
+
+/* Estilo para los checkboxes cuando están seleccionados */
+.form-check-input:checked {
+    background-color: var(--color-principal);
+    border-color: var(--color-principal);
+}
+
+/* Estilo de hover para las filas de la tabla de reportes */
+#lotesTable tbody tr:hover {
+    background-color: rgba(99, 24, 29, 0.075); /* Un tinte muy sutil del color principal */
+    cursor: pointer; /* Cambia el cursor para indicar que la fila es interactiva */
+}

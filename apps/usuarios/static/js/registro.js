@@ -1,54 +1,83 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const passwordInput = document.getElementById('id_password1');
-    const passwordHelpContainer = document.getElementById('password-help-container');
+document.addEventListener('DOMContentLoaded', function() {
+    const openModalBtn = document.getElementById('open-modal-btn');
+    const imageInput = document.getElementById('id_imagen');
+    const avatarPreview = document.getElementById('avatar-preview');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmRegisterModal'));
 
-    if (passwordInput && passwordHelpContainer) {
-        // Lista de validaciones con sus expresiones regulares y mensajes
-        const validations = [
-            { regex: /.{8,}/, message: 'Debe contener al menos 8 caracteres.' },
-            { regex: /[A-Z]/, message: 'Debe contener al menos una mayúscula.' },
-            { regex: /[a-z]/, message: 'Debe contener al menos una minúscula.' },
-            { regex: /[0-9]/, message: 'Debe contener al menos un número.' },
-            { regex: /[^A-Za-z0-9]/, message: 'Debe contener al menos un símbolo.' }
-        ];
+    const fieldsToValidate = {
+        'id_first_name': 'Por favor, ingrese su nombre.',
+        'id_last_name': 'Por favor, ingrese su apellido.',
+        'id_username': 'Por favor, ingrese un nombre de usuario.',
+        'id_email': 'Por favor, ingrese un correo electrónico válido.',
+        'id_password1': 'Por favor, ingrese una contraseña.',
+        'id_password2': 'Por favor, confirme su contraseña.',
+        'id_rol': 'Por favor, seleccione un rol.'
+    };
 
-        // Generar los elementos de la lista de ayuda
-        validations.forEach((validation, index) => {
-            const li = document.createElement('li');
-            li.id = `validation-rule-${index}`;
-            li.textContent = validation.message;
-            li.classList.add('password-rule');
-            passwordHelpContainer.appendChild(li);
-        });
-
-        passwordInput.addEventListener('input', () => {
-            const password = passwordInput.value;
-
-            validations.forEach((validation, index) => {
-                const ruleElement = document.getElementById(`validation-rule-${index}`);
-                if (validation.regex.test(password)) {
-                    ruleElement.classList.add('valid');
-                    ruleElement.classList.remove('invalid');
-                } else {
-                    ruleElement.classList.add('invalid');
-                    ruleElement.classList.remove('valid');
-                }
-            });
-        });
-
-        // Para los mensajes de error de Django (similitud, etc.)
-        // Django los añade en un <ul> con la clase 'errorlist'.
-        // Vamos a moverlos a nuestro contenedor.
-        const djangoErrorList = passwordInput.parentElement.querySelector('.errorlist');
-        if (djangoErrorList) {
-            const djangoErrors = djangoErrorList.querySelectorAll('li');
-            djangoErrors.forEach(error => {
-                const li = document.createElement('li');
-                li.textContent = error.textContent;
-                li.classList.add('password-rule', 'invalid');
-                passwordHelpContainer.appendChild(li);
-            });
-            djangoErrorList.remove(); // Limpiamos la lista original
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                avatarPreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
         }
+    });
+
+    openModalBtn.addEventListener('click', function() {
+        if (validateForm()) {
+            confirmModal.show();
+        }
+    });
+
+    function validateForm() {
+        let isValid = true;
+
+        Object.keys(fieldsToValidate).forEach(fieldId => {
+            const input = document.getElementById(fieldId);
+            if (input) {
+                input.classList.remove('is-invalid');
+                let errorDiv = input.nextElementSibling;
+                if (input.parentElement.classList.contains('input-group')) {
+                    errorDiv = input.parentElement.nextElementSibling;
+                }
+                if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                    errorDiv.textContent = '';
+                }
+            }
+        });
+
+        Object.entries(fieldsToValidate).forEach(([fieldId, errorMessage]) => {
+            const input = document.getElementById(fieldId);
+            if (input && input.value.trim() === '') {
+                isValid = false;
+                input.classList.add('is-invalid');
+                let errorDiv = input.nextElementSibling;
+                if (input.parentElement.classList.contains('input-group')) {
+                    errorDiv = input.parentElement.nextElementSibling;
+                }
+
+                if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                    errorDiv.textContent = errorMessage;
+                }
+            }
+        });
+
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+        if (password1.value && password2.value && password1.value !== password2.value) {
+            isValid = false;
+            password2.classList.add('is-invalid');
+            let errorDiv = password2.nextElementSibling;
+            if (password2.parentElement.classList.contains('input-group')) {
+                errorDiv = password2.parentElement.nextElementSibling;
+            }
+
+            if (errorDiv) {
+                errorDiv.textContent = 'Las contraseñas no coinciden.';
+            }
+        }
+        return isValid;
     }
 });

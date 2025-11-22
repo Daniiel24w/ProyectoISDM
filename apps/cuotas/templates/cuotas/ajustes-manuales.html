@@ -3,6 +3,11 @@
 
 {% block title %}Ajustes Manuales de Cuotas{% endblock %}
 
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static 'css/custom-styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -15,7 +20,7 @@
             <h5 class="mb-0">Buscador de Alumno</h5>
         </div>
         <div class="card-body">
-            <form class="row g-3 align-items-end">
+            <form class="row g-3 align-items-end" id="form-buscar-alumno">
                 <div class="col-md-6">
                     <label for="search-alumno" class="form-label">Ingrese Legajo o DNI del Alumno</label>
                     <input type="text" class="form-control" id="search-alumno" placeholder="Ej: 1234 o 12.345.678">
@@ -28,55 +33,44 @@
     </div>
 
     <!-- Componente 2: Resultados de Búsqueda (Aparece post-búsqueda) -->
-    <div class="card shadow-sm mb-4" id="resultados-busqueda" style="display: block;"> <!-- Cambiar a 'none' para ocultar por defecto -->
+    <div class="card shadow-sm mb-4" id="resultados-busqueda" style="display: none;">
         <div class="card-header">
             <h5 class="mb-0">Resultados</h5>
+            <h5 class="mb-0 fw-semibold">Resultados</h5>
         </div>
         <div class="card-body">
-            <h6 class="card-subtitle mb-2 text-muted">Datos del Alumno</h6>
-            <p><strong>Nombre:</strong> Juan Perez<br>
-               <strong>Legajo:</strong> 1234<br>
-               <strong>DNI:</strong> 12.345.678</p>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> <span id="info-nombre"></span></p>
+                    <p><strong>Legajo:</strong> <span id="info-legajo"></span></p>
+                    <p><strong>DNI:</strong> <span id="info-dni"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Carrera:</strong> <span id="info-carrera"></span></p>
+                    <p><strong>Plan Actual:</strong> <span id="info-plan"></span></p>
+                    <p><strong>Email:</strong> <span id="info-email"></span></p>
+                </div>
+            </div>
             
             <hr>
 
             <h6 class="card-subtitle mt-4 mb-3 text-muted">Cuotas del Alumno</h6>
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" id="tabla-cuotas-alumno" style="width:100%;">
                     <thead class="thead-light">
                         <tr>
+                            <th>ID</th>
                             <th>Período</th>
-                            <th>Monto</th>
+                            <th>Plan de Pago</th>
+                            <th>Monto Original</th>
+                            <th>Monto Final</th>
                             <th>Vencimiento Original</th>
-                            <th>Vencimiento Ajustado</th>
+                            <th>Vencimiento Final</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Ejemplo de cuota pendiente -->
-                        <tr>
-                            <td>Dic-2025</td>
-                            <td>$50.000</td>
-                            <td>10/12/2025</td>
-                            <td>-</td>
-                            <td><span class="badge bg-warning text-dark">Pendiente</span></td>
-                            <td>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#ajustarVencimientoModal">Ajustar Vencimiento</button>
-                            </td>
-                        </tr>
-                        <!-- Ejemplo de cuota pagada -->
-                        <tr>
-                            <td>Nov-2025</td>
-                            <td>$50.000</td>
-                            <td>10/11/2025</td>
-                            <td>-</td>
-                            <td><span class="badge bg-success">Pagada</span></td>
-                            <td>
-                                <button class="btn btn-info btn-sm" disabled>Ajustar Vencimiento</button>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -88,14 +82,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="ajustarVencimientoLabel">Ajustar Vencimiento (Cuota: Dic-2025)</h5>
+                <h5 class="modal-title" id="ajustarVencimientoLabel">Ajustar Cuota</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="form-ajustar-cuota">
+                    <input type="hidden" id="ajuste-cuota-id">
                     <div class="mb-3">
                         <label for="nueva-fecha-vencimiento" class="form-label">Nueva Fecha de Vencimiento</label>
                         <input type="date" class="form-control" id="nueva-fecha-vencimiento">
+                    </div>
+                    <div class="mb-3">
+                        <label for="nuevo-monto" class="form-label">Nuevo Monto (Opcional)</label>
+                        <input type="text" class="form-control" id="nuevo-monto" placeholder="Ej: 55000.00">
                     </div>
                     <div class="mb-3">
                         <label for="motivo-ajuste" class="form-label">Motivo del Ajuste (obligatorio)</label>
@@ -105,7 +104,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">Guardar Ajuste</button>
+                <button type="submit" form="form-ajustar-cuota" class="btn btn-primary">Guardar Ajuste</button>
             </div>
         </div>
     </div>
@@ -113,8 +112,8 @@
 {% endblock %}
 
 {% block custom_js %}
-<script>
-    // Aquí puedes agregar JS para mostrar/ocultar la sección de resultados
-    // y para pasar datos dinámicos al modal.
-</script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="{% static 'js/ajustes-manuales.js' %}"></script>
 {% endblock %}

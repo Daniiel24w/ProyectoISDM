@@ -1,0 +1,163 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Editar Perfil - Proyecto ISDM{% endblock %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static 'css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="registro-card card shadow-lg border-0 col-12 col-lg-10 col-xl-8">
+            <div class="card-body p-4 p-md-5">
+                
+                <div class="text-center mb-4">
+                    <h1 class="h3 mb-3 fw-normal">Editar Perfil</h1>
+                    <p class="text-muted">Actualiza tu información personal.</p>
+                </div>
+
+                <form id="edit-profile-form" method="post" novalidate enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% if user_form.non_field_errors or perfil_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in user_form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                            {% for error in perfil_form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="text-center mb-4">
+                        <img src="{{ perfil.imagen.url }}" alt="Avatar" id="avatar-preview" class="img-fluid rounded-circle profile-avatar mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                        {{ perfil_form.imagen }}
+                        <label for="id_imagen" class="btn btn-sm btn-outline-secondary">Cambiar Imagen (Opcional)</label>
+                        <div class="invalid-feedback d-block">{% for error in perfil_form.imagen.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Nombre:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                {{ user_form.first_name }}
+                            </div>
+                            <div class="invalid-feedback d-block">{% for error in user_form.first_name.errors %}{{ error }}{% endfor %}</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Apellido:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                {{ user_form.last_name }}
+                            </div>
+                            <div class="invalid-feedback d-block">{% for error in user_form.last_name.errors %}{{ error }}{% endfor %}</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ user_form.email.id_for_label }}" class="form-label">Correo:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                            {{ user_form.email }}
+                        </div>
+                        <div class="invalid-feedback d-block">{% for error in user_form.email.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_username" class="form-label">Usuario:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                <input type="text" class="form-control" id="id_username" value="{{ request.user.username }}" readonly disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_password" class="form-label">Contraseña:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input type="password" class="form-control" id="id_password" value="********" readonly disabled>
+                            </div>
+                            <small class="form-text text-muted">La contraseña no se puede cambiar desde aquí.</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ perfil_form.telefono.id_for_label }}" class="form-label">Teléfono (Opcional):</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                            {{ perfil_form.telefono }}
+                        </div>
+                        <div class="invalid-feedback d-block">{% for error in perfil_form.telefono.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ perfil_form.direccion.id_for_label }}" class="form-label">Dirección (Opcional):</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt-fill"></i></span>
+                            {{ perfil_form.direccion }}
+                        </div>
+                        <div class="invalid-feedback d-block">{% for error in perfil_form.direccion.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+
+                    <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'usuarios:perfil' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="button" id="open-modal-btn" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmUpdateModalLabel">Confirmar Cambios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas guardar los cambios en tu perfil?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="edit-profile-form" id="confirm-update-btn" class="btn btn-primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Previsualización de la imagen
+            const imageInput = document.getElementById('id_imagen');
+            const avatarPreview = document.getElementById('avatar-preview');
+            
+            if (imageInput) {
+                imageInput.addEventListener('change', function(event) {
+                    if (event.target.files && event.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            avatarPreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(event.target.files[0]);
+                    }
+                });
+            }
+
+            // Lógica del modal de confirmación
+            const openModalBtn = document.getElementById('open-modal-btn');
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
+
+            if (openModalBtn) {
+                openModalBtn.addEventListener('click', function() {
+                    // Aquí podrías añadir validación de formulario antes de abrir el modal si quieres
+                    confirmModal.show();
+                });
+            }
+        });
+    </script>
+{% endblock %}

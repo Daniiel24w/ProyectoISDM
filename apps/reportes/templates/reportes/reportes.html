@@ -4,27 +4,32 @@
 {% block title %}Supervisión de Lotes{% endblock %}
 
 {% block custom_css %}
-    <link rel="stylesheet" href="{% static 'reportes/css/reportes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom-styles.css' %}">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Supervisión y Reportes</h1>
+    </div>
     <div class="card shadow">
         <div class="card-header">
-            <h2 class="card-title mb-0">Supervisión de Lotes Generados</h2>
+            <h5 class="card-title mb-0">Historial de Lotes Generados</h5>
         </div>
         <div class="card-body">
-            <p class="card-text">Historial de ejecuciones de generación de cuotas.</p>
             <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="lotesTable">
+                <table class="table table-bordered table-hover" id="lotesTable" style="width:100%;">
                     <thead class="thead-light">
                         <tr>
-                            <th>ID Lote</th>
-                            <th>Fecha</th>
+                            <th>ID</th>
+                            <th>Fecha Creación</th>
                             <th>Usuario</th>
-                            <th>Filtros Aplicados</th>
+                            <th>Plan de Pago</th>
                             <th>Estado</th>
+                            <th>Fecha Programación</th>
+                            <th>Monto Total (Est.)</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -37,22 +42,57 @@
     </div>
 </div>
 
-<!-- Modal Ver Resumen -->
-<div class="modal fade" id="resumenModal" tabindex="-1" role="dialog" aria-labelledby="resumenModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+<!-- Modal Ver Resumen (Extenso) -->
+<div class="modal fade" id="resumenModal" tabindex="-1" aria-labelledby="resumenModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="resumenModalLabel">Resumen del Lote LOTE-001</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h5 class="modal-title" id="resumenModalLabel">Resumen del Lote</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p><strong>Cuotas Creadas:</strong> 350</p>
-        <p><strong>Monto Total:</strong> $17,500,000.00</p>
-        <p><strong>Inconsistencias:</strong> 0</p>
+        <!-- Sección de Información General del Lote -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <p><strong>Plan de Pago:</strong> <span id="detalle-plan-nombre"></span></p>
+                <p><strong>Carrera:</strong> <span id="detalle-carrera-nombre"></span></p>
+                <p><strong>Modalidad:</strong> <span id="detalle-carrera-modalidad"></span></p>
+            </div>
+            <div class="col-md-4">
+                <p><strong>Cantidad de Cuotas:</strong> <span id="detalle-cantidad-cuotas"></span></p>
+                <p><strong>Valor de Cuota:</strong> <span id="detalle-valor-cuota"></span></p>
+                <p><strong>Mora Aplicada:</strong> <span id="detalle-mora"></span></p>
+            </div>
+            <div class="col-md-4">
+                <p><strong>Fecha Creación:</strong> <span id="detalle-fecha-creacion"></span></p>
+                <p><strong>Creado por:</strong> <span id="detalle-creado-por"></span></p>
+                <p><strong>Monto Total Estimado:</strong> <span id="detalle-monto-estimado"></span></p>
+            </div>
+        </div>
+        <hr>
+        <!-- Sección de Alumnos y Cuotas -->
+        <h5 class="mt-4">Alumnos y Cuotas Generadas</h5>
+        <input type="text" id="buscador-alumnos-modal" class="form-control mb-3" placeholder="Buscar por legajo, nombre o apellido...">
+        <div class="table-responsive" style="max-height: 400px;">
+            <table class="table table-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Legajo</th>
+                        <th>Alumno</th>
+                        <th>Período</th>
+                        <th>Vencimiento</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-alumnos-cuotas-body">
+                    <!-- Filas de cuotas se insertarán aquí -->
+                </tbody>
+            </table>
+        </div>
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="exportar-pdf-btn">Exportar a PDF</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
@@ -64,10 +104,8 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="anularModalLabel">Anular Lote LOTE-001</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h5 class="modal-title" id="anularModalLabel">Anular Lote</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p>¿Está seguro de que desea anular este lote? Esta acción no se puede deshacer.</p>
@@ -89,5 +127,5 @@
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="{% static 'reportes/js/reportes.js' %}"></script>
+    <script src="{% static 'js/reportes.js' %}"></script>
 {% endblock %}

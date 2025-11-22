@@ -1,12 +1,20 @@
 from django.contrib import admin
-from .models import UserActivity
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from .models import Perfil, UserActivity
 
-@admin.register(UserActivity)
-class UserActivityAdmin(admin.ModelAdmin):
-    list_display = ('user', 'login_time', 'logout_time')
-    list_filter = ('user', 'login_time')
-    search_fields = ('user__username',)
-    readonly_fields = ('user', 'login_time', 'logout_time')
+# Define un admin inline para el modelo Perfil
+class PerfilInline(admin.StackedInline):
+    model = Perfil
+    can_delete = False
+    verbose_name_plural = 'perfiles'
 
-    def has_add_permission(self, request):
-        return False
+# Extiende el UserAdmin para incluir el Perfil
+class UserAdmin(BaseUserAdmin):
+    inlines = (PerfilInline,)
+
+# Vuelve a registrar el User admin con la nueva configuración
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+admin.site.register(UserActivity)

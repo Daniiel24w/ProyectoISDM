@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -140,3 +140,11 @@ LOGIN_URL = 'usuarios:login'
 
 # URL a la que se redirige después de un logout exitoso.
 LOGOUT_REDIRECT_URL = 'usuarios:login'
+
+
+# URL base para servir los archivos multimedia subidos por los usuarios.
+MEDIA_URL = '/media/'
+
+# Ruta absoluta al directorio donde se guardarán los archivos multimedia.
+# Asegúrate de que esta carpeta 'media' exista en la raíz de tu proyecto.
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

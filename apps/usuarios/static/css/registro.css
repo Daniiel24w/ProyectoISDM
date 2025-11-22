@@ -1,0 +1,39 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #f0f2f5;
+}
+
+.registro-container {
+    min-height: 100%;
+}
+
+.registro-card {
+    width: 100%;
+    max-width: 800px; /* Más ancho para acomodar el formulario */
+    border-radius: 1rem;
+}
+
+.registro-logo {
+    height: 70px;
+    width: auto;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.btn-primary {
+    background-color: #8f4545;
+    border-color: #8f4545;
+}
+.btn-primary:hover {
+    background-color: #7a3b3b;
+    border-color: #6e3434;
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+    border-color: #dc3545;
+}

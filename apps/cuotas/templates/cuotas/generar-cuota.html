@@ -5,33 +5,73 @@
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'css/generar-cuota.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom-styles.css' %}">
 {% endblock %}
 
 {% block content %}
+<h1 class="mb-4">Generar Cuotas</h1>
+
 <form method="post">
     {% csrf_token %}
+    {{ form.alumnos_seleccionados }}
 
     <!-- Tarjeta 1: Filtro de Generación -->
     <div class="card shadow-sm mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Filtro de Generación</h5>
+            <h5 class="mb-0 fw-semibold">Filtros de Generación</h5>
         </div>
-        <div class="card-body p-4">
-            <div class="row g-3">
-                <div class="col-md-4">{{ form.carrera.label_tag }}{{ form.carrera }}</div>
-                <div class="col-md-4">{{ form.cohorte.label_tag }}{{ form.cohorte }}</div>
-                <div class="col-md-4">{{ form.plan_pago.label_tag }}{{ form.plan_pago }}</div>
-                <div class="col-md-4">{{ form.mes.label_tag }}{{ form.mes }}</div>
-                <div class="col-md-4">{{ form.año.label_tag }}{{ form.año }}</div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <div class="form-check">
-                        {{ form.forzar_regeneracion }}
-                        {{ form.forzar_regeneracion.label_tag }}
+        <div class="card-body">
+            <!-- Renderizamos los campos del formulario de Django -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <strong>{{ form.plan_pago.label_tag }}  </strong>
+                    {{ form.plan_pago }}
+                </div>
+            </div>
+
+            <!-- Plantilla de Información (se muestra con JS) -->
+            <div id="info-plan-container" class="mt-3" style="display: none;">
+                <div class="row">
+                    <div class="col-md-8"><p><strong>Carrera:</strong> <span id="info-carrera"></span></p></div>
+                    <div class="col-md-4"><p><strong>Año del Plan:</strong> <span id="info-anio"></span></p></div>
+                </div>
+            </div>
+
+            <!-- Selector de alumnos -->
+            <div id="grupo-alumnos-container" class="mt-3" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label fw-bold d-block">Grupo de Alumnos</label>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="seleccionar-todos-alumnos">
+                        <label class="form-check-label" for="seleccionar-todos-alumnos">Seleccionar todos los alumnos</label>
+                    </div>
+
+                    <input type="text" class="form-control mb-2" id="buscador-alumnos" placeholder="Buscar por legajo, nombre o cohorte...">
+
+                    <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;"></th>
+                                    <th style="width: 15%;">Legajo</th>
+                                    <th>Apellido y Nombre</th>
+                                    <th style="width: 15%;">Cohorte</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-alumnos-body">
+                                <!-- Las filas de alumnos se insertarán aquí con JS -->
+                            </tbody>
+                        </table>
+                        <div id="no-alumnos-msg" class="text-center text-muted p-3" style="display: none;">
+                            No se encontraron alumnos para este plan de pago.
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <div class="row">
         <div class="col-lg-6">
@@ -39,8 +79,8 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-header"><h5 class="mb-0">Vencimiento</h5></div>
                 <div class="card-body p-4">
-                    <div class="mb-3">{{ form.dia_vencimiento.label_tag }}{{ form.dia_vencimiento }}</div>
-                    <div>{{ form.manejo_dias_no_habiles.label_tag }}{{ form.manejo_dias_no_habiles }}</div>
+                    <div class="mb-3"><strong>{{ form.dia_vencimiento.label_tag }}</strong>{{ form.dia_vencimiento }}</div>
+                    <div><strong>{{ form.manejo_dias_no_habiles.label_tag }}</strong>{{ form.manejo_dias_no_habiles }}</div>
                 </div>
             </div>
         </div>
@@ -49,17 +89,12 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-header"><h5 class="mb-0">Mora</h5></div>
                 <div class="card-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-12">{{ form.tipo_recargo.label_tag }}{{ form.tipo_recargo }}</div>
-                        <div class="col-md-12">
-                            {{ form.valor_mora.label_tag }}
-                            <div class="input-group">
-                                <span class="input-group-text" id="valor-addon">$</span>
-                                {{ form.valor_mora }}
-                            </div>
-                        </div>
-                        <div class="col-md-12">{{ form.frecuencia_mora.label_tag }}{{ form.frecuencia_mora }}</div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Valor de recargo por mora</strong></label>
+                        <p id="info-mora" class="form-control-plaintext">Seleccione un plan de pago</p>
                     </div>
+                    <strong>{{ form.frecuencia_mora.label_tag }}</strong>
+                    {{ form.frecuencia_mora }}
                 </div>
             </div>
         </div>
@@ -69,60 +104,187 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header"><h5 class="mb-0">Acciones</h5></div>
         <div class="card-body p-4 text-center">
-            <button type="submit" class="btn btn-generate px-5 py-2 mx-2">Generar cuota</button>
-            <button type="button" class="btn btn-schedule px-5 py-2 mx-2" data-bs-toggle="modal" data-bs-target="#programarCuotaModal">Programar cuota</button>
+            <button type="submit" name="generar" class="btn btn-generate px-5 py-2 mx-2">Generar cuota</button>
+            <button type="button" class="btn btn-schedule px-5 py-2 mx-2" data-bs-toggle="modal" data-bs-target="#programarCuotaModal">Programar</button>
         </div>
     </div>
-</form>
 
-<!-- Modal para Confirmar Generación -->
-<div class="modal fade" id="confirmarGeneracionModal" tabindex="-1" aria-labelledby="confirmarGeneracionLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmarGeneracionLabel">Confirmar Generación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ¿Está seguro de que desea generar las cuotas con los filtros seleccionados? Este proceso se ejecutará en segundo plano.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-generate">Confirmar y Generar</button>
+    <!-- Modal para Confirmar Generación -->
+    <div class="modal fade" id="confirmarGeneracionModal" tabindex="-1" aria-labelledby="confirmarGeneracionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header card-header">
+                    <h5 class="modal-title" id="confirmarGeneracionLabel">Confirmar Generación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea generar las cuotas con los filtros seleccionados? Este proceso se ejecutará en segundo plano.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-generate">Confirmar y Generar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal para Programar Cuota -->
-<div class="modal fade" id="programarCuotaModal" tabindex="-1" aria-labelledby="programarCuotaLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="programarCuotaLabel">Programar Generación de Cuota</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
+    <!-- Modal para Programar Cuota -->
+    <div class="modal fade" id="programarCuotaModal" tabindex="-1" aria-labelledby="programarCuotaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header card-header">
+                    <h5 class="modal-title" id="programarCuotaLabel">Programar Generación de Cuota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Seleccione la fecha y hora en la que desea que se ejecute la generación de cuotas.</p>
                     <div class="mb-3">
                         <label for="programar-fecha" class="form-label">Fecha de ejecución</label>
-                        <input type="date" class="form-control" id="programar-fecha">
+                        <input type="date" class="form-control" id="programar-fecha" name="fecha_programacion">
                     </div>
                     <div class="mb-3">
                         <label for="programar-hora" class="form-label">Hora de ejecución</label>
-                        <input type="time" class="form-control" id="programar-hora">
+                        <input type="time" class="form-control" id="programar-hora" name="hora_programacion">
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-schedule">Confirmar Programación</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="programar" class="btn btn-schedule">Confirmar Programación</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}
 
 {% block custom_js %}
-<script src="{% static 'js/generar-cuotas.js' %}"></script>
+<script src="{% static 'js/generar-cuota.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const planPagoSelect = document.getElementById('id_plan_pago');
+    const infoPlanContainer = document.getElementById('info-plan-container');
+    const infoCarreraSpan = document.getElementById('info-carrera');
+    const infoAnioSpan = document.getElementById('info-anio');
+    const infoMoraP = document.getElementById('info-mora');
+    const alumnosContainer = document.getElementById('grupo-alumnos-container');
+    const alumnosTableBody = document.getElementById('tabla-alumnos-body');
+    const noAlumnosMsg = document.getElementById('no-alumnos-msg');
+    const buscadorAlumnos = document.getElementById('buscador-alumnos');
+    const seleccionarTodosCheckbox = document.getElementById('seleccionar-todos-alumnos');
+    // Campo oculto para los legajos de los alumnos seleccionados
+    const hiddenAlumnosInput = document.getElementById('id_alumnos_seleccionados');
+
+    planPagoSelect.addEventListener('change', function() {
+        const planId = this.value;
+        alumnosTableBody.innerHTML = ''; // Limpiar tabla
+
+        if (!planId) {
+            alumnosContainer.style.display = 'none';
+            infoPlanContainer.style.display = 'none';
+            infoMoraP.textContent = 'Seleccione un plan de pago';
+            return;
+        }
+
+        // Usamos la URL que creaste en urls.py
+        fetch(`/cuotas/api/get-alumnos-por-plan/?plan_id=${planId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                    infoPlanContainer.style.display = 'none';
+                    infoMoraP.textContent = 'Error al cargar datos';
+                    alumnosContainer.style.display = 'none';
+                    return;
+                }
+
+                // 1. Rellenar plantilla de información
+                infoPlanContainer.style.display = 'block';
+                // Asumimos que la API devuelve `data.carrera.modalidad`
+                const carreraNombre = data.carrera.modalidad ? `${data.carrera.nombre} (${data.carrera.modalidad})` : data.carrera.nombre;
+                infoCarreraSpan.textContent = carreraNombre;
+                infoAnioSpan.textContent = data.plan_anio;
+
+                // Rellenar campo de mora
+                infoMoraP.textContent = `${data.plan_mora}% (según plan asignado)`;
+
+                // 2. Mostrar y poblar tabla de alumnos
+                alumnosContainer.style.display = 'block';
+                if (data.alumnos.length === 0) {
+                    noAlumnosMsg.style.display = 'block';
+                } else {
+                    // Asumimos que la API devuelve el año del plan en `data.plan_anio`
+                    const planAnio = data.plan_anio;
+                    noAlumnosMsg.style.display = 'none';
+                    data.alumnos.forEach(alumno => {
+                        const isMatchingCohort = alumno.cohorte === planAnio;
+                        const rowClass = alumno.cohorte < planAnio ? 'text-danger' : (isMatchingCohort ? '' : 'text-muted');
+                        const isChecked = isMatchingCohort ? 'checked' : '';
+
+                        const row = `
+                            <tr class="${rowClass}" data-search-text="${alumno.legajo} ${alumno.nombre_completo.toLowerCase()} ${alumno.cohorte}">
+                                <td><input class="form-check-input alumno-checkbox" type="checkbox" value="${alumno.legajo}" ${isChecked} data-cohorte="${alumno.cohorte}"></td>
+                                <td>${alumno.legajo}</td>
+                                <td>${alumno.nombre_completo}</td>
+                                <td>${alumno.cohorte}</td>
+                            </tr>
+                        `;
+                        alumnosTableBody.insertAdjacentHTML('beforeend', row);
+                    });
+                }
+                updateSeleccionarTodosState();
+                updateHiddenInput();
+            });
+    });
+
+    // 3. Lógica del buscador
+    buscadorAlumnos.addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        alumnosTableBody.querySelectorAll('tr').forEach(row => {
+            const rowText = row.dataset.searchText;
+            if (rowText.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // 4. Lógica de "Seleccionar Todos"
+    seleccionarTodosCheckbox.addEventListener('change', function() {
+        alumnosTableBody.querySelectorAll('.alumno-checkbox').forEach(checkbox => {
+            // Solo afecta a las filas visibles
+            if (checkbox.closest('tr').style.display !== 'none') {
+                checkbox.checked = this.checked;
+            }
+        });
+        updateHiddenInput();
+    });
+
+    // 5. Lógica para checkboxes individuales
+    alumnosTableBody.addEventListener('change', function(e) {
+        if (e.target.classList.contains('alumno-checkbox')) {
+            updateSeleccionarTodosState();
+            updateHiddenInput();
+        }
+    });
+
+    function updateSeleccionarTodosState() {
+        const allCheckboxes = alumnosTableBody.querySelectorAll('.alumno-checkbox');
+        const checkedCheckboxes = alumnosTableBody.querySelectorAll('.alumno-checkbox:checked');
+        seleccionarTodosCheckbox.checked = allCheckboxes.length > 0 && allCheckboxes.length === checkedCheckboxes.length;
+    }
+
+    function updateHiddenInput() {
+        const legajos = Array.from(alumnosTableBody.querySelectorAll('.alumno-checkbox:checked'))
+                             .map(cb => cb.value);
+        hiddenAlumnosInput.value = JSON.stringify(legajos);
+    }
+
+    // Al enviar el formulario, nos aseguramos que el campo carrera esté habilitado para ser enviado
+    document.querySelector('form').addEventListener('submit', function() {
+        // Si el campo carrera estuviera deshabilitado, lo habilitamos aquí.
+    });
+
+});
+</script>
 {% endblock %}

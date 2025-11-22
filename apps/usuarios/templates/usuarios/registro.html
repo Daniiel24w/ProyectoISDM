@@ -1,102 +1,144 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Registrar Nuevo Usuario{% endblock %}
+{% block title %}Registrar Usuario - Proyecto ISDM{% endblock %}
 
 {% block custom_css %}
-<style>
-    .input-group-icon {
-        border-right: 0;
-    }
-    .password-rules-list { list-style: none; padding-left: 0; }
-    .password-rule { color: #6c757d; transition: color 0.3s ease; }
-    .password-rule.valid { color: #198754; text-decoration: line-through; }
-    .password-rule.valid::before { content: '✓ '; color: #198754; }
-    .password-rule.invalid { color: #dc3545; }
-    .password-rule.invalid::before { content: '✗ '; color: #dc3545; }
-</style>
+    <link rel="stylesheet" href="{% static 'css/registro.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Registrar Nuevo Usuario</h1>
-    </div>
+<div class="d-flex justify-content-center align-items-center py-4">
+    <div class="registro-card card shadow-lg border-0 col-12 col-lg-10 col-xl-8">
+        <div class="card-body p-4 p-md-5">
+            
+            <div class="text-center mb-4">
+                <img src="{% static 'images/logo-isdm.png' %}" alt="Logo ISDM" class="registro-logo mb-3" style="max-width: 100px;">
+                <h1 class="h3 mb-3 fw-normal">Registrar Nuevo Usuario</h1>
+                <p class="text-muted">Complete el formulario para crear una cuenta.</p>
+            </div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Datos del Usuario</h5>
+            <form id="registro-form" method="post" novalidate enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="text-center mb-4">
+                    <img src="/media/perfiles/default-avatar.png" alt="Avatar" id="avatar-preview" class="img-fluid rounded-circle profile-avatar mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                    <input type="file" name="imagen" id="id_imagen" class="d-none" accept="image/*">
+                    <label for="id_imagen" class="btn btn-sm btn-outline-secondary">Seleccionar Imagen (Opcional)</label>
+                    <div class="invalid-feedback d-block"></div>
                 </div>
-                <div class="card-body p-4">
-                    <form method="post" novalidate>
-                        {% csrf_token %}
 
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
-                            <div class="col-md-6 mb-3">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">Nombre:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            {{ form.first_name }}
                         </div>
-
-                        <div class="mb-3">{{ form.username.label_tag }} {{ form.username }}</div>
-                        {% for error in form.username.errors %}<div class="invalid-feedback d-block mb-2">{{ error }}</div>{% endfor %}
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">{{ form.email.label_tag }} {{ form.email }}</div>
-                            <div class="col-md-6 mb-3">{{ form.telefono.label_tag }} {{ form.telefono }}</div>
+                        <div class="invalid-feedback d-block">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Apellido:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            {{ form.last_name }}
                         </div>
-                        {% for error in form.email.errors %}<div class="invalid-feedback d-block mb-2">{{ error }}</div>{% endfor %}
-                        {% for error in form.telefono.errors %}<div class="invalid-feedback d-block mb-2">{{ error }}</div>{% endfor %}
+                        <div class="invalid-feedback d-block">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+                </div>
 
-                        <hr class="my-4">
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form.password1.label_tag }}
-                                {{ form.password1 }}
-                                <div class="form-text">
-                                    <ul id="password-help-container" class="password-rules-list mt-2">
-                                        <!-- Las reglas de JS se insertarán aquí -->
-                                    </ul>
-                                </div>
-                                {% for error in form.password1.errors %}
-                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                {{ form.password2.label_tag }}
-                                {{ form.password2 }}
-                                {% for error in form.password2.errors %}
-                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                {% endfor %}
-                            </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">Usuario:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            {{ form.username }}
                         </div>
-
-                        <hr class="my-4">
-
-                        <div class="mb-3">
-                            {{ form.rol.label_tag }}
+                        <div class="invalid-feedback d-block">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.rol.id_for_label }}" class="form-label">Rol:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-gear"></i></span>
                             {{ form.rol }}
-                            {% if form.rol.help_text %}
-                                <div class="form-text">{{ form.rol.help_text }}</div>
-                            {% endif %}
-                            {% for error in form.rol.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
                         </div>
-
-                        <div class="mt-4 text-end">
-                            <a href="{% url 'core:index' %}" class="btn btn-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Crear Usuario</button>
-                        </div>
-                    </form>
+                        <div class="invalid-feedback d-block">{% for error in form.rol.errors %}{{ error }}{% endfor %}</div>
+                    </div>
                 </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Correo:</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                        {{ form.email }}
+                    </div>
+                    <div class="invalid-feedback d-block">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">Contraseña:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            {{ form.password1 }}
+                        </div>
+                        <div class="invalid-feedback d-block">{% for error in form.password1.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmar Contraseña:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            {{ form.password2 }}
+                        </div>
+                        <div class="invalid-feedback d-block">{% for error in form.password2.errors %}{{ error }}{% endfor %}</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono (Opcional):</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                        {{ form.telefono }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección (Opcional):</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-geo-alt-fill"></i></span>
+                        {{ form.direccion }}
+                    </div>
+                </div>
+
+                <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'usuarios:login' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="button" id="open-modal-btn" class="btn btn-primary">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmRegisterModal" tabindex="-1" aria-labelledby="confirmRegisterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmRegisterModalLabel">Confirmar Registro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas registrar este nuevo perfil?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="registro-form" id="confirm-register-btn" class="btn btn-primary">Registrar</button>
             </div>
         </div>
     </div>
@@ -104,5 +146,5 @@
 {% endblock %}
 
 {% block custom_js %}
-<script src="{% static 'js/registro.js' %}"></script>
+    <script src="{% static 'js/registro.js' %}"></script>
 {% endblock %}

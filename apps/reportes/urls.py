@@ -1,11 +1,16 @@
 from django.urls import path
-from .views import lista_reportes_view, lotes_data_ajax
+from . import views
 
 app_name = 'reportes'
 
 urlpatterns = [
-    # URL para la página principal que muestra la tabla
-    path('', lista_reportes_view, name='lista_reportes'),
-    # URL para la data en formato JSON que consumirá DataTables
-    path('data/', lotes_data_ajax, name='lotes_data_ajax'),
+    path('', views.lista_reportes_view, name='lista_reportes'),
+    # URL para que DataTables obtenga los datos de los lotes
+    path('api/lotes-data/', views.lotes_data_ajax, name='lotes_data_ajax'),
+    # URL para anular un lote
+    path('api/lote/<int:lote_id>/anular/', views.anular_lote_ajax, name='anular_lote_ajax'),
+    # URL para obtener los detalles de un lote
+    path('api/lote/<int:lote_id>/detalles/', views.lote_detalle_ajax, name='lote_detalle_ajax'),
+    # URL para exportar los detalles de un lote a PDF
+    path('lote/<int:lote_id>/exportar-pdf/', views.exportar_lote_pdf, name='exportar_lote_pdf'),
 ]

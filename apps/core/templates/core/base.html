@@ -11,8 +11,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% block custom_css %}{% endblock %}
+    <style>
+        /* Estilos para el avatar del usuario en el header */
+        .user-avatar img {
+            width: 40px;       /* Ancho fijo para el avatar */
+            height: 40px;      /* Alto fijo para el avatar */
+            object-fit: cover; /* Asegura que la imagen cubra el espacio sin deformarse */
+        }
+    </style>
 </head>
-<body>
+<body class="app-body">
 
     <div id="main-wrapper">
 
@@ -76,14 +84,18 @@
 
                 <div class="dropdown">
                     <div class="user-profile d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="user-avatar"></div>
-                        <span class="user-name ms-2">APELLIDO, NOMBRE1</span>
+                        <div class="user-avatar">
+                            <!-- Usamos la imagen del perfil del usuario, o la de por defecto si no tiene una -->
+                            <img src="{{ request.user.perfil.imagen.url }}" alt="Avatar de {{ request.user.username }}" class="rounded-circle">
+                        </div>
+                        <!-- Mostramos el nombre del usuario logueado -->
+                        <span class="user-name ms-2">{{ request.user.last_name|upper }}, {{ request.user.first_name|upper }}</span>
                         <i class="bi bi-chevron-down ms-2"></i>
                     </div>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                         <li><a class="dropdown-item" href="{% url 'usuarios:perfil' %}"><i class="bi bi-person-circle me-2"></i>Mi Perfil</a></li>
                         {% if user|has_group:"desarrollador" %}
-                        <li><a class="dropdown-item" href="{% url 'usuarios:registro' %}"><i class="bi bi-bi-person-plus-fill me-2"></i>Registrar Usuario</a></li>
+                        <li><a class="dropdown-item" href="{% url 'usuarios:registro' %}"><i class="bi bi-person-plus-fill me-2"></i>Registrar Usuario</a></li>
                         {% endif %}
                         <li>
                             <hr class="dropdown-divider">

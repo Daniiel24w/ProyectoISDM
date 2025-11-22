@@ -16,15 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings  # Importa settings
+from django.conf.urls.static import static  # Importa static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # 1. La ruta raíz ('/') ahora apunta a la app de usuarios (login).
+    # Rutas prefijadas para cada aplicación.
     path('', include('apps.usuarios.urls')),
-
-    # 2. Rutas prefijadas para cada aplicación.
+    # ... otras rutas que tengas
     path('panel/', include('apps.core.urls')),
     path('cuotas/', include('apps.cuotas.urls')),
     path('reportes/', include('apps.reportes.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
